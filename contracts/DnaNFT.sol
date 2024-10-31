@@ -14,7 +14,8 @@ contract DnaNFT is VRFConsumerBaseV2Plus, ERC721URIStorage {
   uint32 immutable numWords;
   uint256 public immutable mintPrice;
   uint256 public immutable maxSupply;
-
+  uint256 private constant MAX_RANGE_TOKEN_ID = 999999;
+  
   uint256 public tokenCounter;
   uint256 public lastArticleId;
   uint256 private _articleRequest;
@@ -78,14 +79,14 @@ contract DnaNFT is VRFConsumerBaseV2Plus, ERC721URIStorage {
 
   function fulfillRandomWords(uint256 requestId, uint256[] calldata randomWords) internal override {
     address nftOwner = _requestToSender[requestId];
-    uint256 tokenId = (randomWords[0] % 20) + 1;
+    uint256 tokenId = (randomWords[0] % MAX_RANGE_TOKEN_ID) + 1;
     _userTokenIds[nftOwner][_articleRequest] = tokenId;
     tokenCounter++;
     _safeMint(nftOwner, tokenId);
 
     string memory tokenURI = _articleURIs[_articleRequest];
     _setTokenURI(tokenId, tokenURI);
-
+    
     emit MintedNFT(nftOwner, tokenId);
   }
 
