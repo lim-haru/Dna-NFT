@@ -86,7 +86,7 @@ contract DnaNFT is VRFConsumerBaseV2Plus, ERC721URIStorage {
 
     string memory tokenURI = _articleURIs[_articleRequest];
     _setTokenURI(tokenId, tokenURI);
-    
+
     emit MintedNFT(nftOwner, tokenId);
   }
 
@@ -98,18 +98,27 @@ contract DnaNFT is VRFConsumerBaseV2Plus, ERC721URIStorage {
   }
 
   function getArticle(uint256 _articleId) external view returns (string memory) {
+    require(_articleId <= lastArticleId, "The article does not exist");
     return _articleURIs[_articleId];
   }
 
-  function getNftId(uint256 _articleId) external view returns (uint256) {
+  function getNftId(uint256 _articleId) public view returns (uint256) {
     uint256 nftId = _userTokenIds[msg.sender][_articleId];
     require(nftId != 0, "You do not own any NFT for this article");
     return nftId;
   }
 
   function getNftTokenURI(uint256 nftId) external view returns (string memory) {
-    require(ownerOf(nftId) != address(0), "Token ID not valid");
+    require(ownerOf(nftId) != address(0), "NFT Id not valid");
     return tokenURI(nftId);
+  }
+
+  function transferArticleNftFrom( address _from, address _to, uint256 _articleId) external {
+    uint256 nftId = getNftId(_articleId);
+    ERC721.transferFrom(_from, _to, nftId);
+
+    _userTokenIds[_from][_articleId] = 0;
+    _userTokenIds[_to][_articleId] = nftId;
   }
 
   function withdraw() external onlyOwner {
