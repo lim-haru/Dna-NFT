@@ -115,7 +115,7 @@ contract DnaNFT is VRFConsumerBaseV2Plus, ERC721URIStorage {
 
   function transferArticleNftFrom( address _from, address _to, uint256 _articleId) external {
     uint256 nftId = getNftId(_articleId);
-    ERC721.transferFrom(_from, _to, nftId);
+    super.transferFrom(_from, _to, nftId);
 
     _userTokenIds[_from][_articleId] = 0;
     _userTokenIds[_to][_articleId] = nftId;
